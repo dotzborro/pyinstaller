@@ -851,8 +851,11 @@ class EXE(Target):
             # Set checksum to appease antiviral software. Also set build timestamp to current time to increase entropy
             # (but honor SOURCE_DATE_EPOCH environment variable for reproducible builds).
             logger.info("Fixing EXE headers")
+            logger.info("dotzborro.dbg.1")
             build_timestamp = int(os.environ.get('SOURCE_DATE_EPOCH', time.time()))
+            logger.info("dotzborro.dbg.2")
             self._retry_operation(winutils.set_exe_build_timestamp, build_name, build_timestamp)
+            logger.info("dotzborro.dbg.3")
             self._retry_operation(winutils.update_exe_pe_checksum, build_name)
         elif is_darwin:
             # If the version of macOS SDK used to build bootloader exceeds that of macOS SDK used to built Python
@@ -880,11 +883,16 @@ class EXE(Target):
             osxutils.sign_binary(build_name, self.codesign_identity, self.entitlements_file)
 
         # Ensure executable flag is set
+        logger.info("dotzborro.dbg.4")
         self._retry_operation(os.chmod, build_name, 0o755)
+        logger.info("dotzborro.dbg.5")
         # Get mtime for storing into the guts
         self.mtm = self._retry_operation(miscutils.mtime, build_name)
+        logger.info("dotzborro.dbg.6")
         if build_name != self.name:
+            logger.info("dotzborro.dbg.6a")
             self._retry_operation(os.rename, build_name, self.name)
+        logger.info("dotzborro.dbg.7")
         logger.info("Building EXE from %s completed successfully.", self.tocbasename)
 
     def _copy_windows_resource(self, build_name, resource_spec):
